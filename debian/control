@@ -1,0 +1,30 @@
+Source: ndn-cpp
+Priority: extra
+Maintainer: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
+Build-Depends: debhelper (>= 8.0.0), autotools-dev,
+ libssl-dev (>= 1.0.0), libsqlite3-dev (>= 3.7.9)
+Standards-Version: 3.9.2
+Section: libs
+Homepage: http://github.com/named-data/ndn-cpp
+Vcs-Git: git://github.com/named-data/ndn-cpp
+Vcs-Browser: http://github.com/named-data/ndn-cpp
+
+Package: ndn-cpp-dev
+Section: libdevel
+Architecture: i386 amd64
+Depends: ndn-cpp (= ${binary:Version})
+Description: A Named Data Networking client library for C++ and C
+ NDN-CPP is a new implementation of a Named Data Networking client 
+ library written in C++ and C.
+ .
+ It is wire format compatible with NDNx and PARC's CCNx.
+
+Package: ndn-cpp
+Section: libs
+Architecture: i386 amd64
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: A Named Data Networking client library for C++ and C
+ NDN-CPP is a new implementation of a Named Data Networking client 
+ library written in C++ and C.
+ .
+ It is wire format compatible with NDNx and PARC's CCNx.

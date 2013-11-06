@@ -29,7 +29,6 @@ config.log
 /condefs.h
 /conftest.cpp
 /conftest.err
-/m4/*
 *.Po
 .deps
 .dirstamp
