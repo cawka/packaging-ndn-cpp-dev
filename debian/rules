@@ -10,7 +10,8 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --parallel
+	dh $@ --parallel --with autoreconf
 
 override_dh_auto_configure:
-	./configure --without-c++11 --with-system-boost
+	dh_auto_configure -- --without-c++11 --with-system-boost
+
