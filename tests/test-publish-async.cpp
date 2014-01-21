@@ -9,15 +9,11 @@
 #include <iostream>
 #include <time.h>
 #include <unistd.h>
-#include <ndn-cpp/face.hpp>
-#include <ndn-cpp/security/identity/memory-identity-storage.hpp>
-#include <ndn-cpp/security/identity/memory-private-key-storage.hpp>
-#include <ndn-cpp/security/policy/no-verify-policy-manager.hpp>
-#include <ndn-cpp/security/key-chain.hpp>
+#include <ndn-cpp-dev/face.hpp>
+#include <ndn-cpp-dev/security/key-chain.hpp>
 
 using namespace std;
 using namespace ndn;
-using namespace ndn::ptr_lib;
 
 static uint8_t DEFAULT_PUBLIC_KEY_DER[] = {
 0x30, 0x81, 0x9F, 0x30, 0x0D, 0x06, 0x09, 0x2A, 0x86, 0x48, 0x86, 0xF7, 0x0D, 0x01, 0x01, 0x01, 0x05, 0x00, 0x03, 0x81,
@@ -67,14 +63,16 @@ static uint8_t DEFAULT_PRIVATE_KEY_DER[] = {
 
 class Echo {
 public:
-  Echo(KeyChain &keyChain, const Name& certificateName)
-  : keyChain_(keyChain), certificateName_(certificateName), responseCount_(0)
+  Echo(KeyChainImpl<SecPublicInfoMemory, SecTpmMemory> &keyChain, Face &face)
+    : keyChain_(keyChain)
+    , face_(face)
+    , responseCount_(0)
   { 
   }
   
   // onInterest.
   void operator()
-     (const shared_ptr<const Name>& prefix, const shared_ptr<const Interest>& interest, Transport& transport,
+     (const ptr_lib::shared_ptr<const Name>& prefix, const ptr_lib::shared_ptr<const Interest>& interest, Transport& transport,
       uint64_t registeredPrefixId) 
   {
     ++responseCount_;
@@ -82,58 +80,57 @@ public:
     // Make and sign a Data packet.
     Data data(interest->getName());
     string content(string("Echo ") + interest->getName().toUri());
+    data.setFreshnessPeriod(1000);
     data.setContent((const uint8_t *)&content[0], content.size());
-    data.getMetaInfo().setTimestampMilliseconds(time(NULL) * 1000.0);
-    keyChain_.sign(data, certificateName_);
-    Blob encodedData = data.wireEncode();
 
-    cout << "Sent content " << content << endl;
-    transport.send(*encodedData);
+    keyChain_.sign(data);
+
+    // Put data on wire
+    face_.put(data);
+
+    // Unregister prefix to ensure that the processing thread finishes after Data
+    // packet is send out to the forwarder
+    face_.unsetInterestFilter(registeredPrefixId);
   }
   
   // onRegisterFailed.
-  void operator()(const shared_ptr<const Name>& prefix)
+  void operator()(const ptr_lib::shared_ptr<const Name>& prefix)
   {
     ++responseCount_;
     cout << "Register failed for prefix " << prefix->toUri() << endl;
   }
 
-  KeyChain keyChain_;
-  Name certificateName_;
+  KeyChainImpl<SecPublicInfoMemory, SecTpmMemory> &keyChain_;
+  Face &face_;
   int responseCount_;
 };
 
 int main(int argc, char** argv)
 {
   try {
-    Face face("localhost");
+    Face face;
         
-    shared_ptr<MemoryIdentityStorage> identityStorage(new MemoryIdentityStorage());
-    shared_ptr<MemoryPrivateKeyStorage> privateKeyStorage(new MemoryPrivateKeyStorage());
-    KeyChain keyChain
-      (make_shared<IdentityManager>(identityStorage, privateKeyStorage), make_shared<NoVerifyPolicyManager>());
-    keyChain.setFace(&face);
-    
+    KeyChainImpl<SecPublicInfoMemory, SecTpmMemory> keyChain;
+
+    Name keyName("/testname/dsk-123");
+
     // Initialize the storage.
-    Name keyName("/testname/DSK-123");
-    Name certificateName = keyName.getSubName(0, keyName.size() - 1).append("KEY").append
-           (keyName.get(keyName.size() - 1)).append("ID-CERT").append("0");
-    identityStorage->addKey(keyName, KEY_TYPE_RSA, Blob(DEFAULT_PUBLIC_KEY_DER, sizeof(DEFAULT_PUBLIC_KEY_DER)));
-    privateKeyStorage->setKeyPairForKeyName
-      (keyName, DEFAULT_PUBLIC_KEY_DER, sizeof(DEFAULT_PUBLIC_KEY_DER), DEFAULT_PRIVATE_KEY_DER, sizeof(DEFAULT_PRIVATE_KEY_DER));
+    keyChain.addPublicKey(keyName, KEY_TYPE_RSA,
+				  PublicKey(DEFAULT_PUBLIC_KEY_DER, sizeof(DEFAULT_PUBLIC_KEY_DER)));
+
+    keyChain.setKeyPairForKeyName(keyName,
+                                            DEFAULT_PUBLIC_KEY_DER, sizeof(DEFAULT_PUBLIC_KEY_DER),
+                                            DEFAULT_PRIVATE_KEY_DER, sizeof(DEFAULT_PRIVATE_KEY_DER));
+
+    keyChain.addCertificateAsKeyDefault(*keyChain.selfSign(keyName));
+    
    
-    Echo echo(keyChain, certificateName);
+    Echo echo(keyChain, face);
     Name prefix("/testecho");
     cout << "Register prefix  " << prefix.toUri() << endl;
-    face.registerPrefix(prefix, ref(echo), ref(echo));
+    face.setInterestFilter(prefix, func_lib::ref(echo), func_lib::ref(echo));
     
-    // The main event loop.  
-    // Wait forever to receive one interest for the prefix.
-    while (echo.responseCount_ < 1) {
-      face.processEvents();
-      // We need to sleep for a few milliseconds so we don't use 100% of the CPU.
-      usleep(10000);
-    }
+    face.processEvents();
   } catch (std::exception& e) {
     cout << "exception: " << e.what() << endl;
   }

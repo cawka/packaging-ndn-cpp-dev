@@ -9,7 +9,7 @@
 #define NDN_BINARYXMLENCODER_HPP
 
 #include <vector>
-#include <ndn-cpp/common.hpp>
+#include <ndn-cpp-dev/common.hpp>
 #include "../util/dynamic-uint8-vector.hpp"
 #include "../c/encoding/binary-xml-encoder.h"
 
@@ -21,9 +21,10 @@ namespace ndn {
 class BinaryXmlEncoder : public ndn_BinaryXmlEncoder {
 public:
   /**
-   * Initialize the base ndn_BinaryXmlEncoder struct with an initial array of 16 bytes.  Use simpleRealloc.
+   * Initialize the base ndn_BinaryXmlEncoder struct with the initialLength.  Use simpleRealloc.
+   * @param initialLength The initial size of the output.  If omitted, use 16.
    */
-  BinaryXmlEncoder() 
+  BinaryXmlEncoder(size_t initialLength = 16) 
   : output_(16)
   {
     ndn_BinaryXmlEncoder_initialize(this, &output_);

@@ -7,7 +7,7 @@
 #ifndef NDN_BINARYXMLDECODER_H
 #define NDN_BINARYXMLDECODER_H
 
-#include <ndn-cpp/c/common.h>
+#include <ndn-cpp-dev/c/common.h>
 #include "../errors.h"
 #include "../util/blob.h"
 
@@ -19,6 +19,10 @@ struct ndn_BinaryXmlDecoder {
   uint8_t *input;
   size_t inputLength;
   size_t offset;
+  // peekDTag sets and checks these, and readElementStartDTag uses them to avoid reading again.
+  size_t previouslyPeekedDTagStartOffset;
+  size_t previouslyPeekedDTagEndOffset;
+  unsigned int previouslyPeekedDTag;
 };
 
 static inline void ndn_BinaryXmlDecoder_initialize(struct ndn_BinaryXmlDecoder *self, uint8_t *input, size_t inputLength) 
@@ -26,6 +30,7 @@ static inline void ndn_BinaryXmlDecoder_initialize(struct ndn_BinaryXmlDecoder *
   self->input = input;
   self->inputLength = inputLength;
   self->offset = 0;
+  self->previouslyPeekedDTagStartOffset = (size_t)-1;
 }
 
 /**
@@ -151,7 +156,7 @@ ndn_Error ndn_BinaryXmlDecoder_readOptionalUnsignedIntegerDTagElement
  * @return 0 for success, else an error code, including an error if not the expected tag
  */
 ndn_Error ndn_BinaryXmlDecoder_readTimeMillisecondsDTagElement
-  (struct ndn_BinaryXmlDecoder *self, unsigned int expectedTag, double *milliseconds);
+  (struct ndn_BinaryXmlDecoder *self, unsigned int expectedTag, ndn_MillisecondsSince1970 *milliseconds);
 
 /**
  * Peek at the next element, and if it has the expectedTag then call ndn_BinaryXmlDecoder_readTimeMillisecondsDTagElement.
@@ -162,7 +167,7 @@ ndn_Error ndn_BinaryXmlDecoder_readTimeMillisecondsDTagElement
  * @return 0 for success, else an error code
  */
 ndn_Error ndn_BinaryXmlDecoder_readOptionalTimeMillisecondsDTagElement
-  (struct ndn_BinaryXmlDecoder *self, unsigned int expectedTag, double *milliseconds);
+  (struct ndn_BinaryXmlDecoder *self, unsigned int expectedTag, ndn_MillisecondsSince1970 *milliseconds);
 
 /**
  * Interpret the bytes as an unsigned big endian integer and convert to a double. Don't check for overflow.
