@@ -1,3 +1,171 @@
+ndn-cpp2 (0.2.1~rc1-1ppa1~1precise1) precise; urgency=low
+
+  [ Jeff Thompson ]
+  * Name: Fix doc comments.
+  * CHANGELOG: Added v0.2
+  * Face: In expressInterest, add optional wireFormat argument.
+  * encoding: Fix bug in getForwardingEntryFlags: Need to check all flags, not the first flag using "else if".
+  * Fix DTAG NDNProtocolDataUnit to encode as "NDN\202\000", same as NDNx. Refs #1056.
+  * CHANGELOG: Added bug fix for DTAG NDNProtocolDataUnit. Refs #1056.
+  * doc: Add documentation for Interest constructors and methods.
+  * transport: Remove unused member elementListener_.
+  * tests: In test-get-async, fix message string.
+  * Interest: In setNonce, make the argument const Blob&.
+  * Key: in setKeyData, just support const Blob& since the Blob constructor makes the necessary conversions.
+  * PublisherPublicKeyDigest: in setPublisherPublicKeyDigest, just support const Blob& since the Blob constructor makes the necessary conversions.
+  * code style: Put return type on the line above.
+  * Code style: In "setter" methods, use meaningful argument name instead of "value".
+  * Sha256WithRsaSignature: In setSignature, etc. only take a Blob. The Blob constructor can make a copy if needed.
+  * MetaInfo: Added setFinalBlockID for Name::Component.
+  * Data MetaInfo: Remove unused setFinalBlockID which take uint8_t*, etc.  The Name::Component constructor can do this.
+  * Data. Fix type: setMetainfo should be setMetaInfo.
+  * Fix from clang compiler warnings: Include header files to avoid implicit declaration.
+  * Fix from clang compiler warnings: Include header files to avoid implicit declaration, use explicit parentheses, use explicit cast for assignment.
+  * Fix from clang compiler warnings: Use explicit parentheses.
+  * Fix clang compiler warning: Cast enum to int for comparison.
+  * security: certificate-data-visitor: CertificateExtensionEntryVisitor::visit should use vector<uin8_t>, not Blob.
+  * security: Add comment that the default IdentityCertificate copy constructor works.
+  * security: Add IdentityCertificate copy constructor.
+  * INSTALL: In File section, add bin/test-publish-async.
+  * make: Move instructions for running ./autogen.sh from configure.ac to the Development section of INSTALL.
+  * make: In Doxyfile, fix EXCLUDE for ndnboost to new location include/ndnboost.
+  * make: Add ax_lib_sqlite3.m4, etc. to m4 directory so that autogen.sh works out of the box. Refs #1064.
+  * make: In INSTALL, in the Development section, remove instructions to download ax_lib_sqlite3.m4, etc. since they are now in the distribution. Refs #1064.
+  * make: In INSTALL, in the Development section, added to install doxygen.
+  * Make: In INSTALL, added Development Prerequisites for Ubuntu.  Split Development section into Development Prerequisites and Development since "Development" is the same for all platforms.
+  * make: In include/Makefile.am, use $(wildcard) so that we only list directories.
+  * security: In BasicIdentityStorage, move the sqlite file to ~/.ndnx/ndnsec-identity.db. Refs #1077.
+  * CHANGELOG: Added bug 1077.  Added other interim changes. Refs #1077.
+  * security: PolicyManager: In checkVerificationPolicy, pass stepCount by value since the reference is not needed to modify the caller's value, and it is copied through to the ValidationRequest constructor.
+  * Interest: Moved class ExcludeEntry to inner class Exclude::Entry.
+  * Exclude: Fix doc comment.
+  * code style: In Exclude, put return types on previous line.
+  * code style: Exclude: Put return type on the previous line.
+  * Interest: Added Interest::toUri().
+  * encoding: In BinaryXmlDecoder, cache the result of peekDTag for a speedup when decoding optional elements.
+  * security: In key-chain.cpp, added a static utility function verifySha256WithRsaSignature.
+  * tests: Add initial test-encode-decode-benchmark
+  * tests: In benchmarks, change to show duration and Hz.
+  * tests: In test-encode-decode-benchmark, pass the encoding into the decode benchmark functions.
+  * encoding: In BinaryXmlEncoder class constructor, added parameter initialLength.
+  * encoding: In BinaryXmlWireFormat::encodeData, set the initial encoding buffer to 1500 bytes.
+  * Name: In C ndn_Name, added appendComponent, appendBlob and appendString.
+  * encoding: In ndn_decodeBinaryXmlName, use ndn_Name_appendBlob.
+  * tests: In Benchmark, added sign/verify, simple/complex and encoding for C.
+  * security: Added SelfVerifyPolicyManager.
+  * tests: In benchmarks, added crypto for C encoding and decoding.
+  * tests: Fix DEFAULT_PUBLIC_KEY_DER format.
+  * tests: In benchmarkEncodeDecodeDataCpp, fix type in comment.
+  * tests: In benchmarkEncodeDecodeDataCpp, fix comment.
+  * encoding: In DynamicUInt8Vector, get should return a non-const result.
+  * Node: In NdndIdFetcher, in onData, should get a const pointer to the signature.
+  * tests: in test-publish-async, needed to use namespace func_lib for ref.
+  * tests: Don't use namespace ptr_lib and qualify ptr_lib::shared_ptr explicitly in case the application also uses std::shared_ptr, etc.
+  * Face: In Face constructor, use shared_ptr instead of default make_shared.
+  * Der encoding: DerNode::accept is not const, so we need a list of non-const children.
+  * Blob: In Blob constructor which takes a shared_ptr for a non-const vector, need to explicitly cast to const.
+  * util: Fix typo on logging.hpp for include common.hpp.
+  * Der encoding: in PublicKeyVisitor, restore the use of dynamic_pointer_cast.
+  * tests: In benchmarkEncodeDecodeDataCpp, change the debug nIterations back to the real values.
+  * tests: In benchmarkEncodeDecodeDataCpp, fix comment.
+  * security: documentation: Fix doc comment for PublicKey constructor and getDigest.
+  * security: documentation: Fix typo in comment for decrypt and encrypt.
+  * security: In SelfVerifyPolicyManager, fix typo in comment.
+  * Move validation-request.hpp to public API.  Moved static verifySha256WithRsaSignature to new Sha256WithRsaHandler::verify.
+  * Name: In Name::Component, added operator<, etc. for comparison.  Refs #1085.
+  * Name: In getPrefix, support a negative argument, e.g. getPrefix(-1). Refs #1086.
+  * security: In IdentityManager::signByCertificate, when setting the KeyLocator keyName, use certificateName.getPrefix(-1) to remove the version number. Refs #1088.
+  * Name: In set and fromEscapedString, support std::string as well as char *.
+  * Rename key.h to key-locator.h. Refs #1089.
+  * Rename key.hpp to key-locator.hpp. Refs #1089.
+  * Rename key.cpp to key-locator.cpp. Refs #1089.
+  * Name: Added function breadthFirstLess to use in sort, and function object BreadthFirstLess to use in map.
+  * In all .cpp files, remove using namespace ndn::ptr_lib and explicitly use ptr_lib::shared_ptr and make_shared.
+  * tests: In test-publish-async, explicitly use func_lib::ref. Refs #1090.
+  * security: internal: In Sha256WithRsaHandler, renamed verify to verifySignature.
+  * security: In Certificate, added getSubjectDescriptionList and getExtensionList.
+  * encoding: In OID, make toString, operator== and operator!= const. Refs #1091.
+  * security: In CertificateSubjectDescription, make toDer and getOidString const. Refs #1091.
+  * security: In CertificateExtension, make toDer and derDerBlob const. Refs #1091.
+  * Node: internal: In node.cpp, use Name size() instead of deprecated getComponentCount.
+  * tests: In test-get-async, temporarily connect directly to borges.metwi.ucla.edu until the test repo is connected to the NDN testbed.
+
+  [ Alexander Afanasyev ]
+  * src+build: Removing autogenerated files from the git repo
+  * build: Makefile.am corrections (separate Makefile.am for tests)
+  * build: Conditional check for C++11 and add ability to use system's boost instead of bundled version
+  * build: Disable modification of global LIBS variable and explicitly specify library's CFLAGS, LDFLAGS, and LIBS variables
+  * src: Add compiled tests to .gitignore
+  * include: Fixing config file include from common.h
+  * encoding: Add TLV-related definitions, data structures, abstraction, and functions
+  * src: Adding conditional compilation against boost or bundled "ndnboost"
+  * face: Renaming (remove)registerPrefix to (unset)interestFilter
+  * time: Changing time units to have int64_t type instead of double
+  * forwarding-entry: Fix "bug" with timeout for self-registered prefix
+  * name: allow negative argument for 'get' method to get component from the back
+  * identity-storage: copying ndn.cxx extensions to get information about the stored data
+  * face+transport: Eliminating concept of ConnectionInfo
+  * exclude: Porting implementation Exclude filter from ndn.cxx
+  * exclude: Implementing TLV encoding/decoding
+  * data: Converting Data packet and related fields to TLV
+  * data: Corrections and separations for Data abstraction
+  * c-util: Fixing ndn_memcpy definition (add necessary consts)
+  * name: Converting Name to TLV
+  * name: More changes related to TLV encoding/decoding implementation
+  * face-management-protocol: Converting ForwardingEntry and ForwardingFlags to TLV
+  * interest: Convert Interest to TLV
+  * interest: More TLV-related changes
+  * transport: (temporary) remove UDP and TCP transports
+  * transport: Implementation of semi-async UNIX transport (for TLV format only)
+  * node: Enabling TLV dispatching
+  * face+transport: Cleanup and preparation for implementation of fully async Face operations
+  * tests: Add boost's test framework based tests
+  * c++-util: Add helper to convert time to/from string
+  * data: setName method is no longer virtual
+  * security: Preliminary work with security module changes
+  * security: CryptoPP functions are used directly to encode/decode DER/BER
+  * security: Fixing decoding/encoding certificates. Now the test is fully working
+  * security: Porting security elements to the updated framework
+  * security: Adapting memory-based identity storage
+  * security: Continue porting security elements to the updated framework
+  * name: Two more append methods
+  * tests: Encode/decode data
+  * key-locator+signature: Extensions and corrections
+  * data: Add ability to print out information about Data packet using std::ostream
+  * face-management-protocol: Defining TLV types and enable encoding/decoding of ForwardingFlags
+  * data: Update TLV encoding/decoding
+  * meta-info: Updated TLV encoding/decoding
+  * signature: Update TLV encoding/decoding
+  * interest: Update TLV encoding/decoding
+  * name: Updating toEscapedString interface
+  * tests: Encode/decode Data
+  * face-management-protocol: Finalizing TLV encoding/decoding for ForwardingEntry
+  * node: Enable empty signature for prefix self-registration request
+  * interest: auto-generating random nonce if not set
+  * node: Fixing "bugs": default interest timeout not infitine; ndnid fetcher was doing hash calculation over the wrong data set
+  * node+face-management-protocol: Adding StatusResponse to the Tlv::FaceManagement
+  * node+face-management-protocol: Finalizing prefix registration (selfreg)
+  * transport/unix: Adding complex logic to handle streamed data
+  * face: Extending Face interface to support ``put`` call
+  * signature: Small extension to Signature API (allow creating signature only based on SignatureInfo block)
+  * node+transport: Improving async operations and error reporting
+  * node: Small complication to allow (in future) aggregation of Face processing threads
+  * data: Small API to update SignatureValue directly, without replacing the whole Signature (both Info and Value block)
+  * security: Signature interface change and initial fixes for OSX private key store
+  * security: Change in KeyChain creation API
+  * data: Extensions to simplify coding
+  * face-management-protocol: Add abstraction for FaceInstance
+  * face-management-protocol: port is actually a string (can be either number or service name)
+  * security: Final fixes for (basic-)identity-storage
+  * build: Disabling (temporary) compilation of binary-xml-wire-format.cpp
+  * transport/unix: Fixing compilation in c++11 mode
+  * security+node: Fixing includes and removing deprecated files
+  * security+tests: Temporarily disable broken code
+  * build: Fixing and suppressing all warnings
+  * and many more
+
+ -- Alexander Afanasyev <alexander.afanasyev@ucla.edu>  Tue, 21 Jan 2014 10:55:19 -0800
+
 ndn-cpp (0.2~rc1-ppa1~precise1) precise; urgency=low
 
   * Initial Release.
