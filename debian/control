@@ -3,7 +3,7 @@ Priority: extra
 Maintainer: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
 Build-Depends: debhelper (>= 8.0.0), autotools-dev, dh-autoreconf,
  libssl-dev (>= 1.0.0), libsqlite3-dev (>= 3.7.9),
- libcrypto++-dev (>= 5.6.1), libboost1.48-all-dev
+ libcrypto++-dev (>= 5.6.1), libboost-all-dev
 Standards-Version: 3.9.2
 Section: libs
 Homepage: http://github.com/named-data/ndn-cpp-dev
