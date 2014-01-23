@@ -1,3 +1,12 @@
+ndn-cpp2 (0.2.1~rc2-1ppa1~1saucy3) saucy; urgency=low
+
+  [ Wentao Shang ]
+  * Add conflict for security tools in control file
+
+  [ wentao ]
+
+ -- Wentao Shang (UCLA) <wentaoshang@gmail.com>  Wed, 22 Jan 2014 18:53:22 -0800
+
 ndn-cpp2 (0.2.1~rc2-1ppa1~1saucy2) saucy; urgency=low
 
   * Fix libboost dependency in control message
