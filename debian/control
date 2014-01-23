@@ -3,7 +3,7 @@ Priority: extra
 Maintainer: Alexander Afanasyev <alexander.afanasyev@ucla.edu>
 Build-Depends: debhelper (>= 8.0.0), autotools-dev, dh-autoreconf,
  libssl-dev (>= 1.0.0), libsqlite3-dev (>= 3.7.9),
- libcrypto++-dev (>= 5.6.1), libboost1.48-all-dev
+ libcrypto++-dev (>= 5.6.1), libboost-all-dev
 Standards-Version: 3.9.2
 Section: libs
 Homepage: http://github.com/named-data/ndn-cpp-dev
@@ -13,7 +13,8 @@ Vcs-Browser: http://github.com/named-data/ndn-cpp-dev
 Package: ndn-cpp2-dev
 Section: libdevel
 Architecture: i386 amd64
-Depends: ndn-cpp2 (= ${binary:Version})
+Depends: ndn-cpp2 (= ${binary:Version}), libssl-dev, libsqlite3-dev,
+ libcrypto++-dev, libboost-all-dev
 Description: A Named Data Networking client library for C++ and C
  NDN-CPP is a new implementation of a Named Data Networking client 
  library written in C++ and C.
