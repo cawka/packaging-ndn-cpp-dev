@@ -10,6 +10,7 @@
 #include <ndn-cpp-dev/ndn-cpp-config.h>
 #ifdef NDN_CPP_HAVE_SQLITE3
 
+#include <sqlite3.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
@@ -102,7 +103,7 @@ SecPublicInfoSqlite3::SecPublicInfoSqlite3()
   // TODO: Handle non-unix file systems which don't have "mkdir -p".
   ::system(("mkdir -p " + identityDir).c_str());
   
-  int res = sqlite3_open((identityDir + '/' + "ndnsec-identity.db").c_str(), &database_);
+  int res = sqlite3_open((identityDir + '/' + "ndnsec-public-info.db").c_str(), &database_);
 
   if (res != SQLITE_OK)
     throw Error("identity DB cannot be opened/created");
