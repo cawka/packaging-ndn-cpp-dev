@@ -13,10 +13,16 @@
 #include "public-key.hpp"
 #include "signature-sha256-with-rsa.hpp"
 
+//PublicInfo
 #include "sec-public-info-sqlite3.hpp"
 #include "sec-public-info-memory.hpp"
-#include "sec-tpm-osx.hpp"
+//TPM
+#include "sec-tpm-file.hpp"
 #include "sec-tpm-memory.hpp"
+
+#ifdef NDN_CPP_HAVE_OSX_SECURITY
+#include "sec-tpm-osx.hpp"
+#endif
 
 
 namespace ndn {
@@ -153,6 +159,22 @@ public:
     return certificate;
   }
 
+  /**
+   * Fetch the private key for keyName and sign the data, and set the signature block of the data packet.
+   * Throw Error if signing fails.
+   * @param data Reference to the input data packet.
+   * @param keyName The name of the signing key.
+   * @param digestAlgorithm the digest algorithm.
+   */  
+  void
+  signInTpm(Data &data, const Name& keyName, DigestAlgorithm digestAlgorithm)
+  {
+    data.setSignatureValue
+      (Tpm::signInTpm(data.wireEncode().value(),
+                      data.wireEncode().value_size() - data.getSignature().getValue().size(),
+                      keyName, digestAlgorithm));
+  }
+
   void
   sign(Data &data)
   {
@@ -184,7 +206,7 @@ public:
     data.setSignature(signature);
 
     // For temporary usage, we support RSA + SHA256 only, but will support more.
-    Tpm::signInTpm(data, cert->getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
+    signInTpm(data, cert->getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
   }
 
   void
@@ -195,7 +217,7 @@ public:
     data.setSignature(signature);
 
     // For temporary usage, we support RSA + SHA256 only, but will support more.
-    Tpm::signInTpm(data, certificate.getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
+    signInTpm(data, certificate.getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
   }
   
   /**
@@ -296,7 +318,7 @@ public:
     cert.setSignature(signature);
 
     // For temporary usage, we support RSA + SHA256 only, but will support more.
-    Tpm::signInTpm(cert, cert.getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
+    signInTpm(cert, cert.getPublicKeyName(), DIGEST_ALGORITHM_SHA256);
   }
 
 
@@ -347,6 +369,8 @@ private:
 
 }
 
+
+
 #ifdef NDN_CPP_HAVE_OSX_SECURITY
 
 namespace ndn
@@ -358,7 +382,7 @@ typedef KeyChainImpl<SecPublicInfoSqlite3, SecTpmOsx> KeyChain;
 
 namespace ndn
 {
-typedef KeyChainImpl<SecPublicInfoMemory, SecTpmMemory> KeyChain;
+typedef KeyChainImpl<SecPublicInfoSqlite3, SecTpmFile> KeyChain;
 };
 
 #endif //NDN_CPP_HAVE_OSX_SECURITY
