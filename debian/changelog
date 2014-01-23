@@ -1,3 +1,25 @@
+ndn-cpp2 (0.2.1~rc3-1ppa1~1precise1) precise; urgency=low
+
+  [ Yingdi Yu ]
+  * encoding: Construct Block from istream
+  * security: Moving signInTpm(Data& data, ...) from SecTpm to KeyChain.
+  * security: Adding SecTpmFile which a pure file based "TPM".
+  * security: Changing security storage location. Adding test case
+
+  [ Jeff Thompson ]
+  * name: Added compare and comparison operators.  Remove breadthFirstLess
+
+  [ Yingdi Yu ]
+  * security: Hiding sqlite3 from the header of SecPublicInfoSqlite
+  * security: Rename KeyChain::signInTpm to KeyChain::signDataInTpm, and make it priviate.
+
+  [ Jeff Thompson ]
+  * node: Fix of getting a pointer to the static member function (& necessary for some compilers)
+
+  [ Alexander Afanasyev ]
+
+ -- Alexander Afanasyev <alexander.afanasyev@ucla.edu>  Thu, 23 Jan 2014 15:38:30 -0800
+
 ndn-cpp2 (0.2.1~rc1-1ppa1~1precise1) precise; urgency=low
 
   [ Jeff Thompson ]
